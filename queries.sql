@@ -4,7 +4,7 @@
 */
 
 --venda_farmacia->inst->concelho
-SELECT conselho.nome
+SELECT concelho.nome
 FROM concelho
     NATURAL JOIN instituicao
     NATURAL JOIN(
@@ -13,14 +13,8 @@ FROM concelho
         WHERE data_registo = GETDATE()
     ) 
 -- tabela com todas vendas_farmacia do dia com os concelhos
-GROUP BY nome
+GROUP BY concelho.nome
 HAVING COUNT(*) > ALL
-    (SELECT count(*)
-    FROM )
-
-
-
-
 
 /** 
 * 2.
