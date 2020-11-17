@@ -14,16 +14,16 @@ FROM concelho
     ) 
 -- tabela com todas vendas_farmacia do dia com os concelhos
 GROUP BY concelho.nome
-HAVING COUNT(*) > ALL
-    (SELECT count(*)
+HAVING COUNT(*) > ALL(
+    SELECT count(*)
     FROM concelho
     NATURAL JOIN instituicao
     NATURAL JOIN(
         SELECT * 
         FROM venda_farmacia
-        WHERE data_registo = GETDATE()
-    ) 
+        WHERE data_registo = GETDATE()) 
     GROUP BY concelho.nome)
+
 -- tabela com todas vendas_farmacia do dia com os concelhos
 
 /** 
@@ -50,10 +50,32 @@ HAVING COUNT(medico) > ALL --selecionar o medicos com mais consultas por regiao
 * do concelho de Arouca este ano? 
 */
 SELECT medico
-FROM
+FROM(
+    SELECT *
+    FROM instituicao
+    WHERE instituicao.tipo = 'farmacia' 
+    NATURAL JOIN(
+        SELECT *
+        FROM concelho
+        WHERE concelho.nome = 'Arouca'
+    )
+    NATURAL JOIN(
+        SELECT *
+        FROM venda_farmacia
+        WHERE venda_farmacia.susbtancia = 'aspirina'
+    )
+    NATURAL JOIN prescricao_venda
+)
 
 
 /*
 * 4.
 * Quais são os doentes que já fizeram análises mas ainda não aviaram prescrições este mês?
 */
+SELECT DISTINCT doente
+FROM analise
+WHERE NOT EXISTS (
+    SELECT *
+    FROM prescricao_venda
+    WHERE prescricao_venda = doente
+)
