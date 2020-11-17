@@ -14,7 +14,7 @@ app = Flask(__name__)
 DB_HOST="db.tecnico.ulisboa.pt";
 DB_USER="" ;
 DB_DATABASE=DB_USER
-DB_PASSWORD="Smario12";
+DB_PASSWORD="";
 DB_CONNECTION_STRING = "host=%s dbname=%s user=%s password=%s" % (DB_HOST, DB_DATABASE, DB_USER, DB_PASSWORD);
 
 
@@ -36,16 +36,16 @@ def list_accounts():
     cursor.close();
     dbConn.close();
 
-@app.route('/accounts');
-def list_accounts_edit():
+@app.route('/medicos');
+def list_medics():
   dbConn=None;
   cursor=None;
   try:
     dbConn = psycopg2.connect(DB_CONNECTION_STRING)
     cursor = dbConn.cursor(cursor_factory = psycopg2.extras.DictCursor)
-    query = "SELECT account_number, branch_name, balance FROM account;"
+    query = "SELECT num_cedula, nome, especialidade FROM medico;"
     cursor.execute(query);
-    return render_template("accounts.html", cursor=cursor, params=request.args)
+    return render_template("medicos.html", cursor=cursor, params=request.args)
   except Exception as e:
     return str(e) ;
   finally:
@@ -58,6 +58,29 @@ def alter_balance():
     return render_template("balance.html", params=request.args);
   except Exception as e:
     return str(e);
+
+
+
+@app.route('/delete', methods=["DELETE"]);
+def remove():
+  dbConn=None
+  cursor=None
+  try:
+    dbConn = psycopg2.connect(DB_CONNECTION_STRING);
+    cursor = dbConn.cursos(cursor_factory = psycopg2.extras.DictCursor);
+    if request.name == "RemoveMedic":
+      query = f'''DELETE FROM medico WHERE num_cedula = '{request.form["RemoveMedic"]}';'''
+    elsif request.name == "RemoveInst":
+      query = f'''DELETE FROM instituicao WHERE nome = '{request.form["RemoveInst"]}';'''
+    elsif request.name == "RemovePresc":
+      query = f'''DELETE FROM prescricao WHERE num_cedula = '{request.form["RemovePresc"]}';'''
+    elsif request.name == "RemoveAnalise":
+      query = f'''DELETE FROM analise WHERE num_analise = '{request.form["RemoveAnalise"]}';'''
+    cursor.execute(query);
+    return query;
+  finally:
+    dbConn.commit();
+    dbConn.close();
 
 
 @app.route('/update', methods=["POST"]);
@@ -79,4 +102,3 @@ def update_balance():
 
 
 CGIHandler().run(app);
-
