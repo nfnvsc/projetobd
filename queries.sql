@@ -15,6 +15,16 @@ FROM concelho
 -- tabela com todas vendas_farmacia do dia com os concelhos
 GROUP BY concelho.nome
 HAVING COUNT(*) > ALL
+    (SELECT count(*)
+    FROM concelho
+    NATURAL JOIN instituicao
+    NATURAL JOIN(
+        SELECT * 
+        FROM venda_farmacia
+        WHERE data_registo = GETDATE()
+    ) 
+    GROUP BY concelho.nome)
+-- tabela com todas vendas_farmacia do dia com os concelhos
 
 /** 
 * 2.
@@ -25,7 +35,7 @@ SELECT medico, regiao.nome
 FROM(
     SELECT *
     FROM prescricao
-    WHERE data >= 01/01/2019 AND data <= 15/06/2019
+    WHERE prescricao.data BETWEEN 01/01/2019 AND 15/06/2019
     NATURAL JOIN consulta
     NATURAL JOIN regiao
 ) 
@@ -39,6 +49,8 @@ HAVING COUNT(medico) > ALL --selecionar o medicos com mais consultas por regiao
 * Quais são os médicos que já prescreveram aspirina em receitas aviadas em todas as farmácias
 * do concelho de Arouca este ano? 
 */
+SELECT medico
+FROM
 
 
 /*
