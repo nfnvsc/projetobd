@@ -1,6 +1,6 @@
 create table regiao (
     num_regiao int,
-    nome char(7),
+    nome char(8),
     num_habitantes int, 
     primary key (num_regiao),
     check (nome in ('Norte', 'Centro', 'Lisboa', 'Alentejo', 'Algarve'))
