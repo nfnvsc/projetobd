@@ -49,20 +49,20 @@ HAVING COUNT(medico) > ALL --selecionar o medicos com mais consultas por regiao
 * Quais são os médicos que já prescreveram aspirina em receitas aviadas em todas as farmácias
 * do concelho de Arouca este ano? 
 */
-SELECT medico
+SELECT DISTINCT medico
 FROM(
-    SELECT *
+    SELECT nome, num_regiao 
     FROM instituicao
     WHERE instituicao.tipo = 'farmacia' 
     NATURAL JOIN(
-        SELECT *
+        SELECT nome as nome_concelho
         FROM concelho
         WHERE concelho.nome = 'Arouca'
     )
     NATURAL JOIN(
         SELECT *
         FROM venda_farmacia
-        WHERE venda_farmacia.susbtancia = 'aspirina'
+        WHERE venda_farmacia.susbtancia = 'aspirina' AND venda_farmacia.data_registo BETWEEN 01/01/2019 AND 31/12/2019
     )
     NATURAL JOIN prescricao_venda
 )
@@ -73,9 +73,12 @@ FROM(
 * Quais são os doentes que já fizeram análises mas ainda não aviaram prescrições este mês?
 */
 SELECT DISTINCT doente
-FROM analise
-WHERE NOT EXISTS (
-    SELECT *
-    FROM prescricao_venda
-    WHERE prescricao_venda = doente
+FROM(
+    SELECT num_doente
+    FROM analise
+    LEFT JOIN(
+        SELECT num_doente
+        FROM prescricao_venda
+    )
+
 )
