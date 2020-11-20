@@ -13,10 +13,15 @@ create table concelho (
     num_habitantes int,
     primary key (num_concelho),
     foreign key (num_regiao) references regiao on delete cascade
+    /*
+    check (nome in (OPENROWSET('Microsot.ACE.OLEDB.12.0',
+    'Excel 12.0; Database=~/ListaFreguesiasVigentes_SFs.xls; HDR_YES; IMEX = 1',
+    'SELECT * FROM [sheet1$D2:3093')));
+    */
 );
 
 create table instituicao (
-    nome char(20),
+    nome char(30),
     tipo char(11),
     num_regiao int,
     num_concelho int,
