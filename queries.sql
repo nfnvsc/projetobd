@@ -8,14 +8,14 @@ SELECT nome, COUNT(*)
 FROM ((SELECT instituicao.num_concelho
     FROM (instituicao INNER JOIN venda_farmacia
             ON instituicao.nome = venda_farmacia.inst)
-    WHERE data_registo = '2019-06-9') as S
+    WHERE data_registo = CURRENT_DATE) as S
     NATURAL JOIN concelho) as N
 GROUP BY nome 
 HAVING COUNT(*) >= ALL 
     (SELECT COUNT(*)
     FROM (instituicao INNER JOIN venda_farmacia
             ON instituicao.nome = venda_farmacia.inst)
-    WHERE data_registo = '2019-06-9'
+    WHERE data_registo = CURRENT_DATE
     GROUP BY num_concelho);
 */
 
@@ -42,7 +42,7 @@ GROUP BY num_regiao
 * do concelho de Arouca este ano?
 */
 
-
+/*
 SELECT num_cedula
 FROM(
     (SELECT *
@@ -62,15 +62,22 @@ FROM(
         WHERE nome = 'Arouca'
     ) as B
 )
-
+*/
 /**
 * 4.
 * Quais são os doentes que já fizeram análises mas ainda não aviaram prescrições este mês?
 */
 
-/*
 SELECT DISTINCT num_doente
 FROM analise
-WHERE NOT EXISTS
-    (SELECT num_doente FROM prescricao_venda WHERE analise.num_doente = prescricao_venda.num_doente)
-*/
+WHERE NOT EXISTS(SELECT num_doente
+    FROM(
+    (SELECT num_doente, num_venda
+    FROM prescricao_venda
+    WHERE analise.num_doente = prescricao_venda.num_doente) as x
+    NATURAL JOIN(
+        SELECT num_venda, data_registo
+        FROM venda_farmacia
+        WHERE extract(MONTH FROM data_registo) = extract(MONTH FROM CURRENT_DATE)) as y
+    )
+)

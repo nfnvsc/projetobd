@@ -60,9 +60,9 @@ insert into venda_farmacia values (3, '2019-06-9', 'aspirina', 100, 20, 'Santa M
 insert into venda_farmacia values (4, '2019-06-10', 'aspirina', 250, 40, 'Joaquim Fernandes');
 
 insert into prescricao_venda values (0, 0, '2019-05-10', 0);
-insert into prescricao_venda values (1, 2, '2019-06-10', 1);
+--insert into prescricao_venda values (1, 2, '2019-06-10', 1);
 insert into prescricao_venda values (2, 1, '2019-07-10', 2);
 insert into prescricao_venda values (1, 1, '2019-01-10', 3);
-insert into prescricao_venda values (1, 2, '2019-02-10', 4);
+--insert into prescricao_venda values (1, 2, '2019-02-10', 4);
 
 --insert into prescricao_venda values (1, 2, '2019-06-10', 0);
