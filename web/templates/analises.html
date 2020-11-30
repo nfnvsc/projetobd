@@ -1,0 +1,58 @@
+<title>List Analises</title>
+<body style="padding:20px">
+  {% if cursor %}
+    <table border="2px">
+      <thead>
+        <tr>
+          <th>Numero da analise</th>
+          <th>Especialidade</th>
+          <th>Numero do medico</th>
+          <th>Numero do doente</th>
+          <th>Data</th>
+          <th>Data do registo</th>
+          <th>Nome</th>
+          <th>Quantidade</th>
+          <th>Nome da instituicao</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for record in cursor %}
+          <tr>
+            <td>{{ record[0] }}</td>
+            <td>{{ record[1] }}</td>
+            <td>{{ record[2] }}</td>
+            <td>{{ record[3] }}</td>
+            <td>{{ record[4] }}</td>
+            <td>{{ record[5] }}</td>
+            <td>{{ record[6] }}</td>
+            <td>{{ record[7] }}</td>
+            <td>{{ record[8] }}</td>
+            <td>
+            <form action="{{url_for('remove')}}" method="post">
+                <input type=hidden value="RemoveAnalise" name="btn" />
+                <input type=hidden value="{{ record[0]  }}" name="value" />
+                <input type=submit value="Remove" />
+            </form>
+            </td>
+          </tr>
+        {% endfor %}
+        <form action="{{url_for('inserir')}}" method="post">
+            <input type=hidden value="AddAnalise" name="btn" />
+            <p>Numero: <input type="text" name="num_analise"/></p>
+            <p>Especialidade: <input type="text" name="especialidade"/></p>
+            <p>Numero Cedula: <input type="text" name="num_cedula"/></p>
+            <p>Numero doente: <input type="text" name="num_doente"/></p>
+            <p>Data Consulta: <input type="text" name="data_consulta"/></p>
+            <p>Data Registo: <input type="text" name="data_registo"/></p>
+            <p>Nome: <input type="text" name="nome"/></p>
+            <p>Quantidade: <input type="text" name="quant"/></p>
+            <p>Instituicao: <input type="text" name="inst"/></p>
+            <p><input type="submit" value="Submit"/></p>
+        </form>
+      </tbody>
+    </table>
+  {% else %}
+    <p> Erro: ao obter dados da base de dados!</p>
+  {% endif %}
+</body>
+</html>

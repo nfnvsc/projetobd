@@ -18,13 +18,23 @@
             <td>{{ record[1] }}</td>
             <td>{{ record[2] }}</td>
             <td>
-              <form action="delete" method="DELETE">
-                <button type="submit" name="RemoveMedic" value="{{ record[0] }}">Remove</button>
+              <form action="{{url_for('remove')}}" method="post">
+                <input type=hidden value="RemoveMedic" name="btn" />
+                <input type=hidden value="{{ record[0]  }}" name="num_cedula" />
+                <input type=submit value="Delete" />
               </form>
             </td>
           </tr>
         {% endfor %}
-      </tbody>
+        <form action="{{url_for('inserir')}}" method="post">
+          <input type=hidden value="AddMedic" name="btn" />
+          
+          <p>Numero Cedula: <input type="text" name="num_cedula"/></p>
+          <p>Nome: <input type="text" name="nomeMedico"/></p>
+          <p>Especialidade: <input type="text" name="especialidade"/></p>
+          <p><input type="submit" value="Submit"/></p>
+        </form>
+      </tbody>      
     </table>
   {% else %}
     <p> Erro: ao obter dados da base de dados!</p>
