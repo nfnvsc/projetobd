@@ -12,9 +12,9 @@ app = Flask(__name__)
 
 ## SGBD configs
 DB_HOST="db.tecnico.ulisboa.pt";
-DB_USER="" ;
+DB_USER="ist193739";
 DB_DATABASE=DB_USER
-DB_PASSWORD="";
+DB_PASSWORD="miguel2000";
 DB_CONNECTION_STRING = "host=%s dbname=%s user=%s password=%s" % (DB_HOST, DB_DATABASE, DB_USER, DB_PASSWORD);
 
 
@@ -25,11 +25,7 @@ def list_accounts():
   dbConn=None
   cursor=None
   try:
-    dbConn = psycopg2.connect(DB_CONNECTION_STRING);
-    cursor = dbConn.cursor(cursor_factory = psycopg2.extras.DictCursor);
-    query = "SELECT * FROM account;";
-    cursor.execute(query);
-    return render_template("index.html", cursor=cursor);
+    return render_template("index.html");
   except Exception as e:
     return str(e); #Renders a page with the error.
   finally:
