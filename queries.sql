@@ -76,6 +76,12 @@ WHERE NOT EXISTS(SELECT num_doente
     )
 )
 
+/**
+* d.
+* Listar as substância prescritas por um médico num dado mês do ano
+*/
+
+SELECT substancia FROM prescricao WHERE num_cedula = request.form["num_cedula"] AND data_consulta = request.form["data_consulta"]
 
 /**
 * e.

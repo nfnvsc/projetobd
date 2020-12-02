@@ -1,3 +1,39 @@
+<head>
+  <style>
+input[type=text], select {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+input[type=submit] {
+  width: 100%;
+  background-color: #4CAF50;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+input[type=submit]:hover {
+  background-color: #45a049;
+}
+
+div {
+  border-radius: 5px;
+  background-color: #f2f2f2;
+  padding: 20px;
+  text-align:center;display:block;
+}
+  </style>
+</head>
+
 <title>List Instituicoes</title>
 <body style="padding:20px">
   {% if cursor %}
@@ -26,19 +62,24 @@
             </td>
           </tr>
         {% endfor %}
+        <div>
         <form action="{{url_for('inserir')}}" method="post">
             <input type=hidden value="AddInst" name="btn" />
-            
             <p>Nome instituição: <input type="text" name="nome"/></p>
-            <p>Tipo: <input type="text" name="tipo"/></p>
+            <select name="tipo">
+              <option value="hospital">Hospital</option>
+              <option value="clinica">Clinica</option>
+            </select>
             <p>Numero regiao: <input type="text" name="regiao"/></p>
             <p>Numero concelho: <input type="text" name="concelho"/></p>
-            <p><input type="submit" value="Submit"/></p>
+            <p><input type="submit" value="Inserir Instituicao"/></p>
         </form>
+      </div>
       </tbody>
     </table>    
   {% else %}
     <p> Erro: ao obter dados da base de dados!</p>
   {% endif %}
+  <div><a href="{{ url_for('index') }}">Voltar</a></div>
 </body>
 </html>
