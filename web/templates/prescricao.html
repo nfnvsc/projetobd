@@ -1,0 +1,10 @@
+<html>
+    <body>
+        <h3>Consultar Prescricoes do Medico {{ record[0] }}</h3>
+        <form action="{{url_for('prescricao')}}" method="post">
+            <p><input type="hidden" name="num_cedula" value="{{ params.get('num_cedula') }}"/></p>
+            <p>Insira a data: <input type="date" name="data_consulta"/></p>
+            <p><input type="submit" value="Submit"/></p>
+        </form>
+    </body>
+</html>
