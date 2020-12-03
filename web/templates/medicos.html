@@ -44,6 +44,7 @@
           <th>Nome do Medico</th>
           <th>Especialidade</th>
           <th>Prescricoes</th>
+          <th>Alterar</th>
           <th>Remover</th>
         </tr>
       </thead>
@@ -54,11 +55,23 @@
             <td>{{ record[1] }}</td>
             <td>{{ record[2] }}</td>
             <td>
-              <form action="{{url_for('mostra')}}" method="post">
+              <form action="{{url_for('mostrapresc')}}" method="post">
                 <input type=hidden value="{{ record[0]  }}" name="num_cedula" />
                 <input type=date name="data_consulta" />
                 <input type=submit value="Consultar" />
             </form>
+            </td>
+            <td>
+              <form action="{{url_for('alterar')}}" method="post">
+                <input type=hidden value="AlterarMedico"  name="btn" />
+                <input type=hidden value="{{ record[0]  }}" name="num_cedula" />
+                <select name="coluna">
+                  <option value="nome">Nome do Medico</option>
+                  <option value="especialidade">Especialidade</option>
+                </select>
+                <input type=text name="valor" />
+                <input type=submit value="Alterar" />
+              </form>
             </td>
             <td>
               <form action="{{url_for('remove')}}" method="post">

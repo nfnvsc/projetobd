@@ -44,6 +44,8 @@ div {
           <th>Tipo</th>
           <th>Numero da Regiao</th>
           <th>Concelho</th>
+          <th>Alterar</th>
+          <th>Remover</th>
         </tr>
       </thead>
       <tbody>
@@ -53,6 +55,18 @@ div {
             <td>{{ record[1] }}</td>
             <td>{{ record[2] }}</td>
             <td>{{ record[3] }}</td>
+            <td>
+              <form action="{{url_for('alterar')}}" method="post">
+                <input type=hidden value="AlterarInstituicao"  name="btn" />
+                <input type=hidden value="{{ record[0]  }}" name="nome" />
+                <select name="coluna">
+                  <option value="num_regiao">Numero da Regiao</option>
+                  <option value="num_conselho">Numero do Conselho</option>
+                </select>
+                <input type=text name="valor" />
+                <input type=submit value="Alterar" />
+              </form>
+            </td>
             <td>
               <form action="{{url_for('remove')}}" method="post">
                 <input type=hidden value="RemoveInst" name="btn" />
@@ -66,6 +80,7 @@ div {
         <form action="{{url_for('inserir')}}" method="post">
             <input type=hidden value="AddInst" name="btn" />
             <p>Nome instituição: <input type="text" name="nome"/></p>
+            <p>Tipo de Instituicao:</p>
             <select name="tipo">
               <option value="hospital">Hospital</option>
               <option value="clinica">Clinica</option>

@@ -1,4 +1,40 @@
-<title>List Consultas</title>
+<head>
+  <style>
+input[type=text], select {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+input[type=submit] {
+  width: 100%;
+  background-color: #4CAF50;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+input[type=submit]:hover {
+  background-color: #45a049;
+}
+
+div {
+  border-radius: 5px;
+  background-color: #f2f2f2;
+  padding: 20px;
+  text-align:center;display:block;
+}
+  </style>
+</head>
+
+<title>List Prescricoes</title>
 <body style="padding:20px">
   {% if cursor %}
     <table border="2px">
@@ -7,7 +43,9 @@
           <th>Numero de Cedula</th>
           <th>Numero do Doente</th>
           <th>Data</th>
-          <th>Nome da instituicao</th>
+          <th>Substancia</th>
+          <th>Alterar</th>
+          <th>Remover</th>
         </tr>
       </thead>
       <tbody>
@@ -17,6 +55,18 @@
             <td>{{ record[1] }}</td>
             <td>{{ record[2] }}</td>
             <td>{{ record[3] }}</td>
+            <td>
+              <form action="{{url_for('alterar')}}" method="post">
+                <input type=hidden value="AlterarPrescricao"  name="btn" />
+                <input type=hidden value="{{ record[3] }}" name="substancia" />
+                <input type=hidden value="{{ record[2] }}" name="data" />
+                <select name="coluna">
+                  <option value="substancia">Substancia</option>
+                </select>
+                <input type=text name="valor" />
+                <input type=submit value="Alterar" />
+              </form>
+            </td>
             <td>
             <form action="{{url_for('remove')}}" method="post">
               <input type=hidden value="RemovePresc" name="btn" />
@@ -33,7 +83,7 @@
           <input type=hidden value="AddPresc" name="btn" />
           <p>Numero cedula: <input type="text" name="num_cedula"/></p>
           <p>Numero doente: <input type="text" name="num_doente"/></p>
-          <p>Data consulta: <input type="text" name="data_consulta"/></p>
+          <p>Data consulta: <input type="date" name="data_consulta"/></p>
           <p>Substancia: <input type="text" name="substancia"/></p>
           <p>Quantidade: <input type="text" name="quant"/></p>
           <p><input type="submit" value="Submit"/></p>
@@ -43,6 +93,6 @@
   {% else %}
     <p> Erro: ao obter dados da base de dados!</p>
   {% endif %}
-  <a href="{{ url_for('index') }}">Go back</a>
+  <div><a href="{{ url_for('index') }}">Voltar</a></div>
 </body>
 </html>

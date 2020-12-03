@@ -5,6 +5,7 @@
       <thead>
         <tr>
           <th>Numero de Cedula</th>
+          <th>Numero de Doente</th>
           <th>Data</th>
           <th>Substancia</th>
           <th>Quantidade</th>
@@ -21,15 +22,24 @@
             <td>{{ record[4] }}</td>
             <td>
                 <form action="{{url_for('compra')}}" method="post">
+                  <input type=hidden value="compraPresc" name="btn" />
                   <input type=hidden value="{{ record[0] }}" name="num_cedula" />
+                  <input type=hidden value="{{ record[1] }}" name="num_doente" />
                   <input type=hidden value="{{ record[2] }}" name="substancia"/>
-                  <input type=hidden value="{{ record[3] }}" name="quantidade"/>
+                  <input type=submit value="compra" />
               </form>
             </td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
+    <p><b>Venda sem prescricao</b></p>
+    <form action="{{url_for('compra')}}" method="post">
+      <input type=hidden value="compra" name="btn" />
+      <p>Substancia: <input type="text" name="substancia"/>
+      Quantidade: <input type="text" name="quantidade"/>
+      <input type="submit" value="compra"/></p>
+    </form>
   {% else %}
     <p> Erro: ao obter dados da base de dados!</p>
   {% endif %}

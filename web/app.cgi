@@ -3,6 +3,7 @@
 from wsgiref.handlers import CGIHandler
 from flask import Flask
 from flask import render_template, request, redirect, url_for
+from datetime import date, datetime
 
 ## Libs postgres
 import psycopg2
@@ -13,27 +14,28 @@ app = Flask(__name__)
 
 ## SGBD configs
 DB_HOST="db.tecnico.ulisboa.pt";
-DB_USER="ist193744";
+DB_USER="ist193739";
 DB_DATABASE=DB_USER
-DB_PASSWORD="ooiw5855";
+DB_PASSWORD="srnt8881";
 DB_CONNECTION_STRING = "host=%s dbname=%s user=%s password=%s" % (DB_HOST, DB_DATABASE, DB_USER, DB_PASSWORD);
-
+vendas_farmacia = 0
 
 ## Runs the function once the root page is requested.
 ## The request comes with the folder structure setting ~/web as the root
 @app.route('/')
 def index():
-  dbConn=None
-  cursor=None
   try:
-    dbConn = psycopg2.connect(DB_CONNECTION_STRING)
-    cursor = dbConn.cursor(cursor_factory = psycopg2.extras.DictCursor)
-    return render_template("index.html", cursor=cursor);
+    return render_template("index.html");
   except Exception as e:
     return str(e); #Renders a page with the error.
-  finally:
-    cursor.close();
-    dbConn.close();
+
+
+@app.route('/farmacia')
+def farmacia():
+  try:
+    return render_template("farmacia.html")
+  except Exception as e:
+    return str(e)
 
 @app.route('/medicos')
 def list_medics():
@@ -99,6 +101,39 @@ def list_analises():
     cursor.close();
     dbConn.close();
 
+@app.route('/compra', methods=["POST"])
+def compra():
+  dbConn=None
+  cursor=None
+  try:
+    dbConn = psycopg2.connect(DB_CONNECTION_STRING)
+    cursor = dbConn.cursor(cursor_factory = psycopg2.extras.DictCursor)
+    argsPresc = []
+    args = []
+    if request.form["btn"] == "compraPresc":
+      argsPresc.append(request.form["num_cedula"])
+      argsPresc.append(request.form["num_doente"])
+      argsPresc.append(date.today().strftime("%d-%m-%y"))
+      argsPresc.append(request.form["substancia"])
+      argsPresc.append(vendas_farmacia)
+      query = f"insert into prescricao_venda values (%s, %s, %s, %s, %s);"
+      cursor.execute(query, argsPresc)
+    args.append(vendas_farmacia)
+    args.append(date.today().strftime("%d-%m-%y"))
+    args.append(request.form["substancia"])
+    args.append(request.form["quantidade"])
+    args.append("12")
+    args.append("hospital")
+    query = f"insert into venda_farmacia values (%s, %s, %s, %s, %s, %s);"
+    cursor.execute(query, args)
+    return url_for('index')
+  finally:
+    dbConn.commit()
+    cursor.close()
+    dbConn.close()
+    
+
+
 @app.route('/infoDoente', methods=["POST"])
 def info():
   dbConn=None
@@ -107,13 +142,64 @@ def info():
     dbConn = psycopg2.connect(DB_CONNECTION_STRING)
     cursor = dbConn.cursor(cursor_factory = psycopg2.extras.DictCursor)
     num_doente = request.form["num_doente"]
-    query = f"SELECT num_doente, data_consulta, substancia, quant FROM prescricao WHERE num_doente = %s"
+    query = f"SELECT * FROM prescricao WHERE num_doente = %s;"
     cursor.execute(query, num_doente)
     #check if cursor is empty (no rows) if true render template cursor=none else that
     return render_template("infoDoente.html", cursor=cursor)
+  except Exception as e:
+    return str(e) ;
   finally:
     cursor.close()
     dbConn.close()
+
+@app.route('/alterar', methods=["POST"])
+def alterar():
+  dbConn=None
+  cursor=None
+  try:
+    dbConn = psycopg2.connect(DB_CONNECTION_STRING)
+    cursor = dbConn.cursor(cursor_factory = psycopg2.extras.DictCursor)
+    args = []
+    if request.form["btn"] == "AlterarMedico":
+      if request.form["coluna"] == "nome":
+        query = f"UPDATE medico SET nome = %s WHERE num_cedula = %s;"
+      elif request.form["coluna"] == "especialidade":
+        query = f"UPDATE medico SET especialidade = %s WHERE num_cedula = %s;"
+      args.append(request.form["valor"])
+      args.append(request.form["num_cedula"])
+      url = "list_medics"
+
+    elif request.form["btn"] == "AlterarInstituicao":
+      if request.form["coluna"] == "num_regiao":
+        query = f"UPDATE instituicao SET num_regiao = %s WHERE nome = %s;"
+      elif request.form["coluna"] == "num_conselho":
+        query = f"UPDATE instituicao SET num_regiao = %s WHERE nome = %s;"
+      args.append(request.form["valor"])
+      args.append(request.form["nome"])
+      url = "list_instituicao"
+
+    elif request.form["btn"] == "AlterarPrescricao":
+      args.append(request.form["valor"])
+      args.append(request.form["data"])
+      args.append(request.form["substancia"])
+      query = f"UPDATE prescricao SET substancia = %s WHERE data_consulta = %s AND substancia = %s;"
+      url = "list_prescricoes"
+      
+    elif request.form["btn"] == "AlterarAnalise":
+      if request.form["coluna"] == "especialidade":
+        query = f"UPDATE analises SET especialidade = %s WHERE num_analise = %s;"
+      elif request.form["coluna"] == "nome":
+        query = f"UPDATE analises SET nome = %s WHERE num_analise = %s;"
+      args.append(request.form["valor"])
+      args.append(request.form["num_analise"])
+      url = "list_analises"
+    cursor.execute(query, args)
+    return redirect(url_for(url))
+  except Exception as e:
+    return str(e) ;
+  finally:
+    dbConn.commit()
+    cursor.close()
 
 @app.route('/insert', methods=["POST"])
 def inserir():
@@ -139,7 +225,7 @@ def inserir():
     elif request.form["btn"] == "AddPresc":
       args.append(request.form["num_cedula"])
       args.append(request.form["num_doente"])
-      args.append(request.form["data_consulta"])
+      args.append(request.form['data_consulta'])
       args.append(request.form["substancia"])
       args.append(request.form["quant"])
       query = f"insert into prescricao values (%s, %s, %s, %s, %s)"
@@ -168,13 +254,14 @@ def inserir():
 def mostrapresc():
   dbConn=None
   cursor=None
+  args = []
   try:
     dbConn = psycopg2.connect(DB_CONNECTION_STRING)
     cursor = dbConn.cursor(cursor_factory = psycopg2.extras.DictCursor)
-    #value = request.form["num_cedula"]
-    #value1 = datetime.strptime(request.form['data_consulta'], '%d-%m-%y')
-    query = f"SELECT substancia FROM prescricao WHERE num_cedula = 0 AND data_consulta = '2019-05-10'"
-    cursor.execute(query)
+    args.append(request.form["num_cedula"])
+    args.append(request.form['data_consulta'])
+    query = f"SELECT substancia FROM prescricao WHERE num_cedula = %s AND data_consulta = %s"
+    cursor.execute(query, args)
     return render_template("mostrapresc.html", cursor=cursor)
   finally:
     cursor.close()
@@ -202,7 +289,7 @@ def remove():
       value2 = request.form["value2"]
       value3 = request.form["value3"]
       value4 = request.form["value4"]
-      query = f"DELETE FROM prescricao WHERE num_cedula = {value} AND num_doente = {value2} AND data_consulta = {value3} AND substancia = {value4}"
+      query = f"DELETE FROM prescricao WHERE num_cedula = {value} AND num_doente = {value2} AND data_consulta = '{value3}' AND substancia = {value4}"
     elif request.form["btn"] == "RemoveAnalise":
       value = request.form["value"]
       query = f"DELETE FROM analise WHERE num_analise = {value}"

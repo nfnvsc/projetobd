@@ -1,11 +1,36 @@
 <head>
   <style>
-  div {
-    width: 50px;
-    padding: 10px;
-    border: 5px solid gray;
-    margin: 0;
-  }
+input[type=text], select {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+input[type=submit] {
+  width: 100%;
+  background-color: #4CAF50;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+input[type=submit]:hover {
+  background-color: #45a049;
+}
+
+div {
+  border-radius: 5px;
+  background-color: #f2f2f2;
+  padding: 20px;
+  text-align:center;display:block;
+}
   </style>
 </head>
 
@@ -24,6 +49,8 @@
           <th>Nome</th>
           <th>Quantidade</th>
           <th>Nome da instituicao</th>
+          <th>Alterar</th>
+          <th>Remover</th>
         </tr>
       </thead>
       <tbody>
@@ -38,6 +65,18 @@
             <td>{{ record[6] }}</td>
             <td>{{ record[7] }}</td>
             <td>{{ record[8] }}</td>
+            <td>
+              <form action="{{url_for('alterar')}}" method="post">
+                <input type=hidden value="AlterarAnalise"  name="btn" />
+                <input type=hidden value="{{ record[0]  }}" name="num_cedula" />
+                <select name="coluna">
+                  <option value="especialidade">Especialidade/option>
+                  <option value="nome">Nome</option>
+                </select>
+                <input type=text name="valor" />
+                <input type=submit value="Alterar" />
+              </form>
+            </td>
             <td>
             <form action="{{url_for('remove')}}" method="post">
                 <input type=hidden value="RemoveAnalise" name="btn" />
@@ -58,7 +97,7 @@
             <p>Nome: <input type="text" name="nome"/></p>
             <p>Quantidade: <input type="text" name="quant"/></p>
             <p>Instituicao: <input type="text" name="inst"/></p>
-            <p><input type="submit" value="Submit"/></p>
+            <p><input type="submit" value="Inserir"/></p>
         </form>
       </tbody>
     </table>

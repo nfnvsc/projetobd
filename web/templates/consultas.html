@@ -1,0 +1,32 @@
+<title>List Prescricoes</title>
+<body style="padding:20px">
+  {% if cursor %}
+    <table border="2px">
+      <thead>
+        <tr>
+          <th>Numero de Cedula</th>
+          <th>Numero do Doente</th>
+          <th>Data</th>
+          <th>Substancia</th>
+          <th>Quantidade</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for record in cursor %}
+          <tr>
+            <td>{{ record[0] }}</td>
+            <td>{{ record[1] }}</td>
+            <td>{{ record[2] }}</td>
+            <td>{{ record[3] }}</td>
+            <td>{{ record[4] }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <b><a href="inserir">Inserir novo medico</a></b>
+  {% else %}
+    <p> Nao tem nenhuma prescricao!</p>
+  {% endif %}
+  <a href="{{ url_for('index') }}">Go back</a>
+</body>
+</html>
