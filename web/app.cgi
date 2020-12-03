@@ -99,6 +99,22 @@ def list_analises():
     cursor.close();
     dbConn.close();
 
+@app.route('/infoDoente', methods=["POST"])
+def info():
+  dbConn=None
+  cursor=None
+  try:
+    dbConn = psycopg2.connect(DB_CONNECTION_STRING)
+    cursor = dbConn.cursor(cursor_factory = psycopg2.extras.DictCursor)
+    num_doente = request.form["num_doente"]
+    query = f"SELECT num_doente, data_consulta, substancia, quant FROM prescricao WHERE num_doente = %s"
+    cursor.execute(query, num_doente)
+    #check if cursor is empty (no rows) if true render template cursor=none else that
+    return render_template("infoDoente.html", cursor=cursor)
+  finally:
+    cursor.close()
+    dbConn.close()
+
 @app.route('/insert', methods=["POST"])
 def inserir():
   dbConn=None
