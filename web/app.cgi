@@ -99,6 +99,22 @@ def list_analises():
     cursor.close();
     dbConn.close();
 
+@app.route('/infoDoente', methods=["POST"])
+def info():
+  dbConn=None
+  cursor=None
+  try:
+    dbConn = psycopg2.connect(DB_CONNECTION_STRING)
+    cursor = dbConn.cursor(cursor_factory = psycopg2.extras.DictCursor)
+    num_doente = request.form["num_doente"]
+    query = f"SELECT num_doente, data_consulta, substancia, quant FROM prescricao WHERE num_doente = %s"
+    cursor.execute(query, num_doente)
+    #check if cursor is empty (no rows) if true render template cursor=none else that
+    return render_template("infoDoente.html", cursor=cursor)
+  finally:
+    cursor.close()
+    dbConn.close()
+
 @app.route('/insert', methods=["POST"])
 def inserir():
   dbConn=None
@@ -141,9 +157,28 @@ def inserir():
       url = "list_analises"
     cursor.execute(query, args)
     return redirect(url_for(url))
+  except Exception as e:
+    return str(e) ;
   finally:
     dbConn.commit()
     cursor.close()
+
+
+@app.route('/mostrapresc', methods=["POST"])
+def mostrapresc():
+  dbConn=None
+  cursor=None
+  try:
+    dbConn = psycopg2.connect(DB_CONNECTION_STRING)
+    cursor = dbConn.cursor(cursor_factory = psycopg2.extras.DictCursor)
+    #value = request.form["num_cedula"]
+    #value1 = datetime.strptime(request.form['data_consulta'], '%d-%m-%y')
+    query = f"SELECT substancia FROM prescricao WHERE num_cedula = 0 AND data_consulta = '2019-05-10'"
+    cursor.execute(query)
+    return render_template("mostrapresc.html", cursor=cursor)
+  finally:
+    cursor.close()
+    dbConn.close()
 
 
 @app.route('/delete', methods=["POST"])

@@ -1,3 +1,14 @@
+<head>
+  <style>
+  div {
+    width: 50px;
+    padding: 10px;
+    border: 5px solid gray;
+    margin: 0;
+  }
+  </style>
+</head>
+
 <title>List Analises</title>
 <body style="padding:20px">
   {% if cursor %}
@@ -54,5 +65,8 @@
   {% else %}
     <p> Erro: ao obter dados da base de dados!</p>
   {% endif %}
+  <div>
+  <a href="{{ url_for('index') }}">Voltar</a>
+</div>
 </body>
 </html>

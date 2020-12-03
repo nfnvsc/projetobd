@@ -1,0 +1,38 @@
+<title>Info Doente</title>
+<body style="padding:20px">
+  {% if cursor %}
+    <table border="2px">
+      <thead>
+        <tr>
+          <th>Numero de Cedula</th>
+          <th>Data</th>
+          <th>Substancia</th>
+          <th>Quantidade</th>
+          <th>Comprar</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for record in cursor %}
+          <tr>
+            <td>{{ record[0] }}</td>
+            <td>{{ record[1] }}</td>
+            <td>{{ record[2] }}</td>
+            <td>{{ record[3] }}</td>
+            <td>{{ record[4] }}</td>
+            <td>
+                <form action="{{url_for('compra')}}" method="post">
+                  <input type=hidden value="{{ record[0] }}" name="num_cedula" />
+                  <input type=hidden value="{{ record[2] }}" name="substancia"/>
+                  <input type=hidden value="{{ record[3] }}" name="quantidade"/>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p> Erro: ao obter dados da base de dados!</p>
+  {% endif %}
+  <a href="{{ url_for('farmacia') }}">Go back</a>
+</body>
+</html>
