@@ -9,8 +9,9 @@ begin
     if (select count(*) from consulta where
             consulta.num_cedula == new.num_cedula and 
             consulta.nome_instituicao == new.nome_instituicao and 
-            consulta.data_consulta between 
-            (semana..)) >= 100
+            consulta.data_consulta
+            group by weekly
+            having count(*) > 100) != null
 
         raise exception 'O Médico % excedeu o número máximo de consultas possiveis semanais.', new.num_cedula;
     end if;
