@@ -33,7 +33,13 @@ create index indice2 on medico using hash(especialidade);
 *      2- Os médicos estão uniformemente distribuídos pelas 6 especialidades.
 */
 
+/* RESPOSTA:
+É possivel conter 2 registos por cada bloco
+Desta forma, e sabendo que os medicos estão igualmente distribuidos, 
+podemos criar uma hashtable na coluna das especialiades para acelerar o acesso
+*/
 
+create index indice3 on medico using hash(especialidade);
 
 /**
 * 4.
