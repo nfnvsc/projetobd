@@ -3,6 +3,7 @@
 * Qual o concelho onde se fez o maior volume de vendas hoje?
 */
 
+/*
 SELECT nome, COUNT(*)
 FROM ((SELECT instituicao.num_concelho
     FROM (instituicao INNER JOIN venda_farmacia
@@ -16,12 +17,14 @@ HAVING COUNT(*) >= ALL
             ON instituicao.nome = venda_farmacia.inst)
     WHERE data_registo = GETDATE()
     GROUP BY num_concelho);
+*/
 
 /**
 * 2.
 * Qual o médico que mais prescreveu no 1º semestre de 2019 em cada região?
 */
 
+/*
 SELECT DISTINCT num_cedula, num_regiao
 FROM(
     SELECT num_cedula, num_regiao, COUNT(num_cedula) as Aux
@@ -31,6 +34,7 @@ FROM(
         ON instituicao.nome = consulta.nome_instituicao) AS S 
     GROUP BY num_cedula, num_regiao) as t
 GROUP BY num_regiao
+*/
 
 /**
 * 3.
@@ -38,6 +42,7 @@ GROUP BY num_regiao
 * do concelho de Arouca este ano?
 */
 
+/*
 SELECT num_cedula
 FROM(
     (SELECT *
@@ -57,11 +62,14 @@ FROM(
         WHERE nome = 'Arouca'
     ) as B
 )
+*/
+
 /**
 * 4.
 * Quais são os doentes que já fizeram análises mas ainda não aviaram prescrições este mês?
 */
 
+/*
 SELECT DISTINCT num_doente
 FROM analise
 WHERE NOT EXISTS(SELECT num_doente
@@ -75,37 +83,30 @@ WHERE NOT EXISTS(SELECT num_doente
         WHERE extract(MONTH FROM data_registo) = extract(MONTH FROM CURRENT_DATE)) as y
     )
 )
+*/
 
 /**
 * d.
 * Listar as substância prescritas por um médico num dado mês do ano
 */
 
+/*
 SELECT substancia FROM prescricao WHERE num_cedula = request.form["num_cedula"] AND data_consulta = request.form["data_consulta"]
+*/
 
 /**
 * e.
 * Listar os valores de glicémia mais alto e mais baixo em cada concelho e respectivo doente.
 */
 
-SELECT max(quant), num_doente, nome_concelho 
+SELECT quant, num_doente, nome_concelho 
 FROM(
     (SELECT quant, inst, num_doente
     FROM analise
-    WHERE nome = "glicemia") as a
+    WHERE nome = 'glicemia') as a
     NATURAL JOIN(
         SELECT num_concelho FROM instituicao)  as i
     NATURAL JOIN(
         SELECT nome as nome_concelho FROM concelho) as c)
-GROUP BY nome_concelho
-UNION
-SELECT min(quant), num_doente, nome_concelho 
-FROM(
-    (SELECT quant, inst, num_doente
-    FROM analise
-    WHERE nome = "glicemia") as a
-    NATURAL JOIN(
-        SELECT num_concelho FROM instituicao)  as i
-    NATURAL JOIN(
-        SELECT nome as nome_concelho FROM concelho) as c)
-GROUP BY nome_concelho
+GROUP BY nome_concelho, num_doente, quant
+HAVING quant = MAX(quant) or quant = MIN(quant)
