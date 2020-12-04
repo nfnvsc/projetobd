@@ -5,11 +5,11 @@
 */
 
 /* RESPOSTA:
-Criar um indice para organizar a coluna num_doente da tabela consulta com uma HashTable,
+Criar um indice para organizar a coluna num_doente da tabela consulta, utilizando o ja existente num_doente,
 de forma a tornar mais eficiente a comparação direta "num_doente = <valor>"
 */
 
-create index indice1 on consulta using hash(num_doente)
+create index indice1 on consulta(num_doente);
 
 /**
 * 2.
@@ -18,14 +18,12 @@ create index indice1 on consulta using hash(num_doente)
 */
 
 /* RESPOSTA:
-ou hashtable?
-Utilizar um indice bit map, em que cada uma das 6 especialidades
-representa uma sequencia diferente num total de 3 bits (necessarios) 
-para a representação de pelo menos 6 especidades diferentes.
-000 - especialidade 1,
-001 - especialidade 2,
-etc..
+Criar um indice para organizar os medicos por diferentes especialidades usando uma hastable,
+desta forma, acedemos diretamente a uma lista com todos os medicos da especialidade pretendida
 */
+
+create index indice2 on medico using hash(especialidade);
+
 
 /**
 * 3.
@@ -42,8 +40,12 @@ etc..
 */
 
 /* RESPOSTA:
-Utilizar um indice BTREE na coluna data da tabela consulta, de forma a otimizar
+Utilizar um indice BTREE na coluna data_consulta da tabela consulta, de forma a otimizar
 a seleção entre duas datas.
 Para facilitar a operação "consulta.num_cedula = medico.num_cedula" cria-se um
-indice Hastable em ambas colunas.
+indice em ambas colunas.
 */
+
+create index index4 on consulta using BTREE(data_consulta);
+create index index5 on consulta(num_cedula);
+create index index6 on medico(num_cedula);
