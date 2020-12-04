@@ -92,7 +92,7 @@ create table prescricao_venda (
     num_doente int,
     data_consulta date,
     substancia char(30),
-    num_venda int,
+    num_venda int unique,
     primary key (num_cedula, num_doente, data_consulta, substancia, num_venda),
     foreign key (num_venda) references venda_farmacia on delete cascade,
     foreign key (num_cedula, num_doente, data_consulta, substancia) references prescricao(num_cedula, num_doente, data_consulta, substancia) on delete cascade
