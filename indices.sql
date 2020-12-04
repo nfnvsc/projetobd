@@ -34,6 +34,7 @@ create index indice2 on medico using hash(especialidade);
 */
 
 
+
 /**
 * 4.
 * Listar os nomes dos médicos que deram consultas entre duas datas
