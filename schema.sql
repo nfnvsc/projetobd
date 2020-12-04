@@ -1,7 +1,7 @@
 create table regiao (
     num_regiao int,
     nome char(8),
-    num_habitantes int, 
+    num_habitantes int,
     primary key (num_regiao),
     check (nome in ('Norte', 'Centro', 'Lisboa', 'Alentejo', 'Algarve'))
 );
@@ -9,7 +9,7 @@ create table regiao (
 create table concelho (
     num_concelho int,
     num_regiao int,
-    nome char(20), 
+    nome char(20),
     num_habitantes int,
     primary key (num_concelho),
     foreign key (num_regiao) references regiao on delete cascade
@@ -56,7 +56,7 @@ create table prescricao(
     substancia char(30),
     quant int,
     primary key (num_cedula, num_doente, data_consulta, substancia),
-    foreign key (num_cedula, num_doente, data_consulta) 
+    foreign key (num_cedula, num_doente, data_consulta)
         references consulta(num_cedula, num_doente, data_consulta)
         on delete cascade
 );
@@ -68,7 +68,7 @@ create table analise (
     num_doente int not null,
     data_consulta date not null,
     data_registo date,
-    nome char(20), 
+    nome char(20),
     quant int,
     inst char(20),
     primary key (num_analise),
@@ -91,10 +91,11 @@ create table prescricao_venda (
     num_cedula int,
     num_doente int,
     data_consulta date,
+    substancia char(30),
     num_venda int,
-    primary key (num_cedula, num_doente, data_consulta, num_venda),
+    primary key (num_cedula, num_doente, data_consulta, substancia, num_venda),
     foreign key (num_venda) references venda_farmacia on delete cascade,
-    foreign key (num_cedula, num_doente, data_consulta) references consulta(num_cedula, num_doente, data_consulta) on delete cascade
+    foreign key (num_cedula, num_doente, data_consulta, substancia) references prescricao(num_cedula, num_doente, data_consulta, substancia) on delete cascade
 );
 
 

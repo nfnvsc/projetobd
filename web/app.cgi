@@ -18,7 +18,6 @@ DB_USER="ist193739";
 DB_DATABASE=DB_USER
 DB_PASSWORD="srnt8881";
 DB_CONNECTION_STRING = "host=%s dbname=%s user=%s password=%s" % (DB_HOST, DB_DATABASE, DB_USER, DB_PASSWORD);
-vendas_farmacia = 0
 
 ## Runs the function once the root page is requested.
 ## The request comes with the folder structure setting ~/web as the root
@@ -32,10 +31,47 @@ def index():
 
 @app.route('/farmacia')
 def farmacia():
+  dbConn=None
+  cursor=None
   try:
-    return render_template("farmacia.html")
+    dbConn = psycopg2.connect(DB_CONNECTION_STRING)
+    cursor = dbConn.cursor(cursor_factory = psycopg2.extras.DictCursor)
+    query = "SELECT * FROM venda_farmacia;"
+    cursor.execute(query)
+    return render_template("farmacia.html", cursor=cursor)
   except Exception as e:
     return str(e)
+  finally:
+    cursor.close()
+    dbConn.close()
+
+@app.route('/glicemia')
+def glicemia():
+  dbConn=None
+  cursor=None
+  try:
+    dbConn = psycopg2.connect(DB_CONNECTION_STRING)
+    cursor = dbConn.cursor(cursor_factory = psycopg2.extras.DictCursor)
+    query = "SELECT max(quant), num_doente, nome_concelho \
+    FROM((SELECT quant, inst, num_doente FROM analise \
+    WHERE nome = glicemia) as a\
+    NATURAL JOIN(SELECT num_concelho FROM instituicao)  as i\
+    NATURAL JOIN(SELECT nome as nome_concelho FROM concelho) as c)\
+    GROUP BY nome_concelho\
+    UNION\
+    SELECT min(quant), num_doente, nome_concelho \
+    FROM((SELECT quant, inst, num_doente\
+    FROM analise WHERE nome = glicemia) as a\
+    NATURAL JOIN(SELECT num_concelho FROM instituicao)  as i\
+    NATURAL JOIN(SELECT nome as nome_concelho FROM concelho) as c)\
+    GROUP BY nome_concelho"
+    cursor.execute(query)
+    return render_template("glicemia.html", cursor = cursor)
+  except Exception as e:
+    return str(e)
+  finally:
+    cursor.close()
+    dbConn.close()
 
 @app.route('/medicos')
 def list_medics():
@@ -101,6 +137,10 @@ def list_analises():
     cursor.close();
     dbConn.close();
 
+
+"""
+COMO É QUE ARRANJA O NUMERO DA ULTIMA VENDA PARA INCREMENTAR
+"""
 @app.route('/compra', methods=["POST"])
 def compra():
   dbConn=None
@@ -113,25 +153,27 @@ def compra():
     if request.form["btn"] == "compraPresc":
       argsPresc.append(request.form["num_cedula"])
       argsPresc.append(request.form["num_doente"])
-      argsPresc.append(date.today().strftime("%d-%m-%y"))
+      argsPresc.append(request.form["data"])
       argsPresc.append(request.form["substancia"])
       argsPresc.append(vendas_farmacia)
       query = f"insert into prescricao_venda values (%s, %s, %s, %s, %s);"
       cursor.execute(query, argsPresc)
+
     args.append(vendas_farmacia)
-    args.append(date.today().strftime("%d-%m-%y"))
+    args.append(date.today())
     args.append(request.form["substancia"])
     args.append(request.form["quantidade"])
     args.append("12")
     args.append("hospital")
     query = f"insert into venda_farmacia values (%s, %s, %s, %s, %s, %s);"
     cursor.execute(query, args)
-    return url_for('index')
+    return redirect(url_for('index'))
+  except Exception as e:
+    return str(e) ;
   finally:
     dbConn.commit()
     cursor.close()
     dbConn.close()
-    
 
 
 @app.route('/infoDoente', methods=["POST"])
@@ -184,7 +226,7 @@ def alterar():
       args.append(request.form["substancia"])
       query = f"UPDATE prescricao SET substancia = %s WHERE data_consulta = %s AND substancia = %s;"
       url = "list_prescricoes"
-      
+
     elif request.form["btn"] == "AlterarAnalise":
       if request.form["coluna"] == "especialidade":
         query = f"UPDATE analises SET especialidade = %s WHERE num_analise = %s;"
@@ -239,6 +281,7 @@ def inserir():
       args.append(request.form["data_registo"])
       args.append(request.form["nome"])
       args.append(request.form["quant"])
+      args.append(request.form["inst"])
       query = f"insert into analise (%s, %s, %s, %s, %s, %s, %s, %s, %s);"
       url = "list_analises"
     cursor.execute(query, args)
@@ -259,10 +302,12 @@ def mostrapresc():
     dbConn = psycopg2.connect(DB_CONNECTION_STRING)
     cursor = dbConn.cursor(cursor_factory = psycopg2.extras.DictCursor)
     args.append(request.form["num_cedula"])
-    args.append(request.form['data_consulta'])
-    query = f"SELECT substancia FROM prescricao WHERE num_cedula = %s AND data_consulta = %s"
+    args.append(request.form["data_consulta"])
+    query = "SELECT num_cedula, substancia, data_consulta FROM prescricao WHERE num_cedula = %s AND data_consulta = %s;"
     cursor.execute(query, args)
     return render_template("mostrapresc.html", cursor=cursor)
+  except Exception as e:
+    return str(e)
   finally:
     cursor.close()
     dbConn.close()
@@ -294,9 +339,10 @@ def remove():
       value = request.form["value"]
       query = f"DELETE FROM analise WHERE num_analise = {value}"
       url = "list_analises"
-
     cursor.execute(query)
     return redirect(url_for(url))
+  except Exception as e:
+    return str(e)
   finally:
     dbConn.commit()
     cursor.close()

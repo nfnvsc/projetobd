@@ -2,9 +2,36 @@
 <html>
     <body>
         <h3>Farmacia</h3>
-        <form action="url_for({{'info'}})" method="post">
+        <form action="{{url_for('info')}}" method="post">
             <p>Numero de Doente: <input type="text" name="num_doente"/></p>
             <p><input type="submit" value="Submit"/></p>
         </form>
+        {% if cursor %}
+        <table border="2px">
+          <thead>
+            <tr>
+              <th>Numero de venda</th>
+              <th>Data de Registo</th>
+              <th>Substancia</th>
+              <th>Quantidade</th>
+              <th>Preco</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for record in cursor %}
+              <tr>
+                <td>{{ record[0] }}</td>
+                <td>{{ record[1] }}</td>
+                <td>{{ record[2] }}</td>
+                <td>{{ record[3] }}</td>
+                <td>{{ record[4] }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p> Erro: ao obter dados da base de dados!</p>
+      {% endif %}
+      <div><a href="{{ url_for('index') }}">Voltar</a></div>
     </body>
 </html>

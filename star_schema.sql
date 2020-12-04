@@ -32,7 +32,7 @@ create table d_instituicao(
 );
 
 create table f_presc_venda(
-    id_presc_venda integer unique?? not null,
+    id_presc_venda integer unique not null,
     id_medico integer not null,
     num_doente integer not null,
     id_data_registo integer not null,
@@ -65,9 +65,9 @@ create table f_analise(
 /* Carregar dados */
 
 insert into d_tempo (
-    select distinct 
-    extract (day from data_consulta) as dia, 
-    extract (month from data_consulta) as mes, 
+    select distinct
+    extract (day from data_consulta) as dia,
+    extract (month from data_consulta) as mes,
     extract (year from data_consulta) as ano,
     extract (isodow from data_consulta) as dia_da_semana,
     extract (week from data_consulta) as semana,
