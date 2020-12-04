@@ -52,19 +52,17 @@ def glicemia():
   try:
     dbConn = psycopg2.connect(DB_CONNECTION_STRING)
     cursor = dbConn.cursor(cursor_factory = psycopg2.extras.DictCursor)
-    query = "SELECT max(quant), num_doente, nome_concelho \
-    FROM((SELECT quant, inst, num_doente FROM analise \
-    WHERE nome = glicemia) as a\
-    NATURAL JOIN(SELECT num_concelho FROM instituicao)  as i\
-    NATURAL JOIN(SELECT nome as nome_concelho FROM concelho) as c)\
-    GROUP BY nome_concelho\
-    UNION\
-    SELECT min(quant), num_doente, nome_concelho \
-    FROM((SELECT quant, inst, num_doente\
-    FROM analise WHERE nome = glicemia) as a\
-    NATURAL JOIN(SELECT num_concelho FROM instituicao)  as i\
-    NATURAL JOIN(SELECT nome as nome_concelho FROM concelho) as c)\
-    GROUP BY nome_concelho"
+    query = "SELECT quant, num_doente, nome_concelho \
+    FROM( \
+    (SELECT quant, inst, num_doente \
+    FROM analise \
+    WHERE nome = 'glicemia') as a \
+    NATURAL JOIN( \
+    SELECT num_concelho FROM instituicao)  as i \
+    NATURAL JOIN( \
+    SELECT nome as nome_concelho FROM concelho) as c) \
+    GROUP BY nome_concelho, num_doente, quant \
+    HAVING quant = MAX(quant) or quant = MIN(quant)" 
     cursor.execute(query)
     return render_template("glicemia.html", cursor = cursor)
   except Exception as e:
@@ -148,8 +146,22 @@ def compra():
   try:
     dbConn = psycopg2.connect(DB_CONNECTION_STRING)
     cursor = dbConn.cursor(cursor_factory = psycopg2.extras.DictCursor)
+    query = "SELECT MAX(num_venda) FROM venda_farmacia"
+    cursor.execute(query)
+
+    vendas_farmacia = cursor.fetchone()[0]
+    vendas_farmacia += 1
     argsPresc = []
     args = []
+
+    args.append(vendas_farmacia)
+    args.append(date.today())
+    args.append(request.form["substancia"])
+    args.append(request.form["quantidade"])
+    args.append("20")
+    args.append("São José")
+    query = f"insert into venda_farmacia values (%s, %s, %s, %s, %s, %s);"
+    cursor.execute(query, args)
     if request.form["btn"] == "compraPresc":
       argsPresc.append(request.form["num_cedula"])
       argsPresc.append(request.form["num_doente"])
@@ -158,15 +170,6 @@ def compra():
       argsPresc.append(vendas_farmacia)
       query = f"insert into prescricao_venda values (%s, %s, %s, %s, %s);"
       cursor.execute(query, argsPresc)
-
-    args.append(vendas_farmacia)
-    args.append(date.today())
-    args.append(request.form["substancia"])
-    args.append(request.form["quantidade"])
-    args.append("12")
-    args.append("hospital")
-    query = f"insert into venda_farmacia values (%s, %s, %s, %s, %s, %s);"
-    cursor.execute(query, args)
     return redirect(url_for('index'))
   except Exception as e:
     return str(e) ;
@@ -174,7 +177,7 @@ def compra():
     dbConn.commit()
     cursor.close()
     dbConn.close()
-
+    
 
 @app.route('/infoDoente', methods=["POST"])
 def info():
@@ -226,7 +229,7 @@ def alterar():
       args.append(request.form["substancia"])
       query = f"UPDATE prescricao SET substancia = %s WHERE data_consulta = %s AND substancia = %s;"
       url = "list_prescricoes"
-
+      
     elif request.form["btn"] == "AlterarAnalise":
       if request.form["coluna"] == "especialidade":
         query = f"UPDATE analises SET especialidade = %s WHERE num_analise = %s;"
